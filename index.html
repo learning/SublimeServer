@@ -25,39 +25,50 @@
         </ul>
       </header>
       <section>
-        <h1>Preface</h1>
+        <h2>Preface</h2>
 
 <ul>
 <li>SublimeServer is a Sublime Text 2 Plugin, so you must get <a href="http://www.sublimetext.com/">Sublime Text 2</a> first</li>
 <li>I'm not a Pythoner, so, the code maybe uncomely</li>
-</ul><h1>Introduction</h1>
+</ul><h2>Introduction</h2>
 
 <p>What SublimeServer can do? It can serves all the open project folders in Sublime, also the sub-floders and files in it, convenience for test you static html pages.
-<img src="http://www.sublimetext.com/screenshots/pythonHeroSmall.png" alt="Screenshot"></p>
+<img src="images/1.png" alt="Screenshot"></p>
 
-<h1>System Tested</h1>
+<h2>System Tested</h2>
 
 <p>SublimeServer has been tested in Mac OS X Lion and Windows 7 64bit, linux not tested.</p>
 
-<h1>Installation</h1>
-
+<h2>Installation</h2>
+<h3>Using git</h3>
 <ol>
 <li>cd to your Sublime packages folder, don't know where is it? Open Sublime and choose Preferences -&gt; Browser Packages, yeah, here is it!</li>
 <li><code>$ git clone git://github.com/learning/SublimeServer.git</code></li>
 <li>Done!</li>
-</ol><h1>How to use</h1>
+</ol>
+<h3>Using archive file</h3>
+<ol>
+<li>Open Sublime and choose Preferences -&gt; Browser Packages.</li>
+<li>Extract the archive file here, you'll get a folder named <i>SublimeServer</i>, and now it works.</li>
+</ol>
+<h2>How to use</h2>
 
 <ul>
 <li>Go to you Sublime, you'll find a SublimeServer menu under Tool -&gt; SublimeServer</li>
 <li>Change the setting as you wish, choose Tool -&gt; SublimeServer -&gt; Settings</li>
-<li>Once the SublimeServer started, you can view your file by control-click(right-click in Windows) at the current edit region. <img src="http://www.sublimetext.com/screenshots/pythonHeroSmall.png" alt="Screenshot">
+<li>Once the SublimeServer started, you can view your file by control-click(right-click in Windows) at the current edit region. <img src="images/2.png" alt="Screenshot">
 </li>
 <li>Or just type <code>http://localhost:port/</code> in your browser, the default port is <code>8080</code>, your can change it in the SublimeServer settings file</li>
-</ul><h1>Change Log</h1>
-
+</ul>
+<h2>Change Log</h2>
+<h3>0.1.0 - Jun 02, 2012</h3>
+<p>SublimeServer can basically use</p>
+<p>Know issues:</p>
 <ul>
-<li>Jun 02, 2012, 0.1.0 release, SublimeServer can basically use</li>
-</ul><h1>Support</h1>
+  <li>While sublime reload plugins, last SublimeServer thread still alive and cannot stop it.</li>
+  <li>While dragging new folders to Sublime or remove folders from Sublime, SublimeServer cannot refresh it.</li>
+</ul>
+<h2>Support</h2>
 
 <ul>
 <li>Any good suggestion or improvement? Welcome! Go to <a href="https://github.com/learning/SublimeServer/issues">issue page</a> or <a href="https://github.com/learning/SublimeServer/fork">fork it!</a>
@@ -65,8 +76,8 @@
 </ul>
       </section>
       <footer>
-        <p>This project is maintained by <a href="https://github.com/learning">learning</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+        <p>This project is maintained by <a href="https://learning.github.com/">Learning</a></p>
+        <p><small>Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
       </footer>
     </div>
     <script src="javascripts/scale.fix.js"></script>
