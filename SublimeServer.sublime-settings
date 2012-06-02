@@ -1,3 +1,5 @@
 {
-	"port": 7000
+	"port": 8080, // The port which SublimeServer using
+	"attempts": 5, // Fail attempts
+	"interval": 500 // Interval between two attempts
 }
