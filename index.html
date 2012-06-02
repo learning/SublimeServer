@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Sublimeserver by learning</title>
+    <title>SublimeServer by learning</title>
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
@@ -15,9 +15,9 @@
   <body>
     <div class="wrapper">
       <header>
-        <h1>Sublimeserver</h1>
-        <p>Allow you run a HTTP Server in SublimeText 2, and serves all the open project folders</p>
-        <p class="view"><a href="https://github.com/learning/SublimeServer">View the Project on GitHub <small>learning/SublimeServer</small></a></p>
+        <h1>SublimeServer</h1>
+        <p>A Sublime Plugin that allow you run a HTTP Server in SublimeText 2, and serves all the open project folders in Sublime</p>
+        <p class="view"><a href="https://github.com/learning/SublimeServer/fork">Fork the Project on GitHub <small>learning/SublimeServer</small></a></p>
         <ul>
           <li><a href="https://github.com/learning/SublimeServer/zipball/master">Download <strong>ZIP File</strong></a></li>
           <li><a href="https://github.com/learning/SublimeServer/tarball/master">Download <strong>TAR Ball</strong></a></li>
@@ -30,22 +30,22 @@
 <ul>
 <li>SublimeServer is a Sublime Text 2 Plugin, so you must get <a href="http://www.sublimetext.com/">Sublime Text 2</a> first</li>
 <li>I'm not a Pythoner, so, the code maybe uncomely</li>
-</ul><h2>Introduction</h2>
+</ul><h1>Introduction</h1>
 
 <p>What SublimeServer can do? It can serves all the open project folders in Sublime, also the sub-floders and files in it, convenience for test you static html pages.
 <img src="http://www.sublimetext.com/screenshots/pythonHeroSmall.png" alt="Screenshot"></p>
 
-<h3>System Tested</h3>
+<h1>System Tested</h1>
 
 <p>SublimeServer has been tested in Mac OS X Lion and Windows 7 64bit, linux not tested.</p>
 
-<h3>Installation</h3>
+<h1>Installation</h1>
 
 <ol>
 <li>cd to your Sublime packages folder, don't know where is it? Open Sublime and choose Preferences -&gt; Browser Packages, yeah, here is it!</li>
 <li><code>$ git clone git://github.com/learning/SublimeServer.git</code></li>
 <li>Done!</li>
-</ol><h3>How to use</h3>
+</ol><h1>How to use</h1>
 
 <ul>
 <li>Go to you Sublime, you'll find a SublimeServer menu under Tool -&gt; SublimeServer</li>
@@ -53,11 +53,11 @@
 <li>Once the SublimeServer started, you can view your file by control-click(right-click in Windows) at the current edit region. <img src="http://www.sublimetext.com/screenshots/pythonHeroSmall.png" alt="Screenshot">
 </li>
 <li>Or just type <code>http://localhost:port/</code> in your browser, the default port is <code>8080</code>, your can change it in the SublimeServer settings file</li>
-</ul><h3>Change Log</h3>
+</ul><h1>Change Log</h1>
 
 <ul>
 <li>Jun 02, 2012, 0.1.0 release, SublimeServer can basically use</li>
-</ul><h3>Support</h3>
+</ul><h1>Support</h1>
 
 <ul>
 <li>Any good suggestion or improvement? Welcome! Go to <a href="https://github.com/learning/SublimeServer/issues">issue page</a> or <a href="https://github.com/learning/SublimeServer/fork">fork it!</a>
@@ -70,16 +70,17 @@
       </footer>
     </div>
     <script src="javascripts/scale.fix.js"></script>
-              <script type="text/javascript">
-            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-          </script>
-          <script type="text/javascript">
-            try {
-              var pageTracker = _gat._getTracker("UA-32163560-1");
-            pageTracker._trackPageview();
-            } catch(err) {}
-          </script>
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-32163560-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
 
   </body>
 </html>
