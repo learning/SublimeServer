@@ -4,4 +4,4 @@
 
 ------
 
-###For more details please visit http://learning.github.com/sublimeserver
+###For more details please visit http://learning.github.com/SublimeServer
