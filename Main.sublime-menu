@@ -1,0 +1,28 @@
+[
+    {
+        "caption": "Tools",
+        "mnemonic": "T",
+        "id": "tools",
+        "children":
+        [
+            {
+                "caption": "SublimeServer",
+                "children":
+                [
+                    { "command": "sublimeserver_start", "caption": "Start SublimeServer" },
+                    { "command": "sublimeserver_stop", "caption": "Stop SublimeServer" },
+                    { "command": "sublimeserver_restart", "caption": "Restart SublimeServer" },
+                    { "caption": "-" },
+                    { 
+                    	"caption": "Settings...", 
+                    	"command": "open_file", 
+                    	"args": {
+				            "file": "${packages}/SublimeServer/SublimeServer.sublime-settings"
+				        }
+        			}
+                ]
+            }
+
+        ]
+    }
+]
