@@ -1,4 +1,4 @@
-__version__ = "0.1.0"
+__version__ = "0.1.2"
 
 # SublimeServer Settings
 settings = None
@@ -45,6 +45,7 @@ def load_settings():
         s.set('attempts', defaultAttempts)
     if not s.has('interval'):
         s.set('interval', defaultInterval)
+    sublime.save_settings('SublimeServer.sublime-settings')
     return s
 
 def get_directories():
@@ -77,8 +78,6 @@ def get_directories():
             else:
                 dic[key] = f
     return dic
-
-settings = load_settings()
 
 class SublimeServer(BaseHTTPServer.BaseHTTPRequestHandler):
 
@@ -245,8 +244,10 @@ class SublimeServerThread(threading.Thread):
 
     def __init__(self):
         global settings
+        # threading.Thread.__init__(self)
+        super(SublimeServerThread, self).__init__()
         self.httpd = TCPServer(("", settings.get('port')), SublimeServer)
-        threading.Thread.__init__(self)
+        self.setName(self.__class__.__name__)
         
     def run(self):        
         self.httpd.serve_forever()
@@ -259,12 +260,9 @@ class SublimeServerThread(threading.Thread):
 
 class SublimeserverStartCommand(sublime_plugin.WindowCommand):
     def run(self):
-        global setting, thread, dic, attempts
-        if type(thread) is SublimeServerThread and threa.is_alive():
+        global settings, thread, dic, attempts
+        if thread is not None and thread.is_alive():
             return sublime.message_dialog('SublimeServer Alread Started!')
-        if type(thread) is SublimeServerThread:
-            # thread is dead
-            thread = None
         try:
             dic = get_directories()
             thread = SublimeServerThread()
@@ -288,34 +286,19 @@ class SublimeserverStartCommand(sublime_plugin.WindowCommand):
 class SublimeserverStopCommand(sublime_plugin.WindowCommand):
     def run(self):
         global thread
-        if type(thread) is SublimeServerThread:
-            # Don't know how to kill a thread, just set to None
-            # Any good suggedstion?
+        if thread is not None and thread.is_alive():
             thread.stop()
+            thread.join()
             thread = None
         sublime.status_message('SublimeServer Stopped!')
 
 class SublimeserverRestartCommand(sublime_plugin.WindowCommand):
     def run(self):
-        global settings, thread, attempts
-        if type(thread) is SublimeServerThread and thread.is_alive():
-            thread.stop()
-            thread = None
-        try:
-            thread = SublimeServerThread()
-            thread.start()
-            sublime.status_message('SublimeServer Restart Finish!')
-        except socket.error, (value, message):
-            attempts += 1
-            if attempts > settings.get('attempts'):
-                # max attempts reached
-                attempts = 0
-                sublime.message_dialog(message)
-            else:
-                sublime.set_timeout(lambda: 
-                    self.window.run_command('sublimeserver_restart'), 
-                    settings.get('interval')
-                )
+        self.window.run_command('sublimeserver_stop')
+        sublime.set_timeout(lambda: 
+            self.window.run_command('sublimeserver_start'), 
+            settings.get('interval')
+        )
 
 class SublimeserverBrowserCommand(sublime_plugin.TextCommand):
     def run(self, edit):
@@ -329,7 +312,17 @@ class SublimeserverBrowserCommand(sublime_plugin.TextCommand):
         for k in dic:
             if filename.startswith(dic[k]):
                 url = url.format(settings.get('port'), 
-                    k + filename[dic[k].__len__():])
+                    k + filename[len(dic[k]):])
                 return webbrowser.open(url)
         rawname = filename.split(os.path.sep)[-1]
         sublime.message_dialog('File %s not in Sublime Project Folder!' % rawname)
+
+# load settings now
+settings = load_settings()
+
+# check if last SublimeServerThread exists
+threads = threading.enumerate()
+for t in threads:
+    if t.__class__.__name__ is SublimeServerThread.__name__:
+        thread = t
+        break

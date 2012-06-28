@@ -15,7 +15,7 @@
     	"caption": "SublimeServer: Manage SublimeServer Settings", 
     	"command": "open_file", 
     	"args": {
-            "file": "${packages}/SublimeServer/SublimeServer.sublime-settings"
+            "file": "${packages}/User/SublimeServer.sublime-settings"
         }
 	}
 ]
