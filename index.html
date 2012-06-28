@@ -37,7 +37,7 @@
 
 <h2>System Tested</h2>
 
-<p>SublimeServer has been tested in Mac OS X Lion and Windows 7 64bit, linux not tested.</p>
+<p>SublimeServer has been test on Mac OS X Lion, Windows 7 and Windows XP, linux not tested.</p>
 
 <h2>Installation</h2>
 <h3>Install with Package Control</h3>
@@ -67,11 +67,20 @@
 <li>Or just type <code>http://localhost:port/</code> in your browser, the default port is <code>8080</code>, your can change it in the SublimeServer settings file</li>
 </ul>
 <h2>Change Log</h2>
+<h3>0.1.2 - Jun 28, 2012</h3>
+<p>Bug fix:</p>
+<ul>
+  <li>Thread still alive and cannot stop.(<a href="https://github.com/learning/SublimeServer/issues/2" target="_blank">#2</a>)</li>
+</ul>
+<p>Misc:</p>
+<ul>
+  <li>Move <code>SublimeServer.sublime-settings</code> to <code>User</code> folder.</li>
+</ul>
 <h3>0.1.0 - Jun 02, 2012</h3>
 <p>SublimeServer can basically use</p>
 <p>Know issues:</p>
 <ul>
-  <li>While sublime reload plugins, last SublimeServer thread still alive and cannot stop it.</li>
+  <li>While sublime reload plugins, last SublimeServer thread still alive and cannot stop it.(<a href="https://github.com/learning/SublimeServer/issues/2" target="_blank">#2</a>)</li>
   <li>While dragging new folders to Sublime or remove folders from Sublime, SublimeServer cannot refresh it.</li>
 </ul>
 <h2>Support</h2>
