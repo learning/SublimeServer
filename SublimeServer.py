@@ -1,4 +1,4 @@
-__version__ = "0.1.2"
+__version__ = "0.2.0"
 
 # SublimeServer Settings
 settings = None
@@ -22,6 +22,7 @@ import cgi
 import sys
 import shutil
 import mimetypes
+import time
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -35,6 +36,13 @@ def load_settings():
     defaultAttempts = 5
     # default interval
     defaultInterval = 500
+    # default mimeType
+    defaultMimeTypes = {
+        '': 'application/octet-stream', # Default
+        '.py': 'text/plain',
+        '.c': 'text/plain',
+        '.h': 'text/plain',
+    }
 
     # load SublimeServer settings
     s = sublime.load_settings('SublimeServer.sublime-settings')
@@ -45,6 +53,8 @@ def load_settings():
         s.set('attempts', defaultAttempts)
     if not s.has('interval'):
         s.set('interval', defaultInterval)
+    if not s.has('mimetypes'):
+        s.set('mimetypes', defaultMimeTypes)
     sublime.save_settings('SublimeServer.sublime-settings')
     return s
 
@@ -86,8 +96,7 @@ class SublimeServer(BaseHTTPServer.BaseHTTPRequestHandler):
     """
 
     server_version = "SublimeServer/" + __version__
-
-    # dic = get_directories()
+    extensions_map = {}
 
     def do_GET(self):
         """Serve a GET request."""
@@ -201,6 +210,10 @@ class SublimeServer(BaseHTTPServer.BaseHTTPRequestHandler):
         path = path.split('#',1)[0]
         path = posixpath.normpath(urllib.unquote(path))
         if path == '/':
+            sublime.set_timeout(lambda: sublime.run_command('sublimeserver_reload'), 0)
+            # sleep 0.001 second to wait SublimeserverReloadCommand done
+            # any else sulotion?
+            time.sleep(0.001)
             return path
         # the browser try to get favourite icon
         if path == '/favicon.ico':
@@ -221,23 +234,13 @@ class SublimeServer(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def guess_type(self, path):
         base, ext = posixpath.splitext(path)
-        if ext in self.extensions_map:
-            return self.extensions_map[ext]
+        if ext in SublimeServer.extensions_map:
+            return SublimeServer.extensions_map[ext]
         ext = ext.lower()
-        if ext in self.extensions_map:
-            return self.extensions_map[ext]
+        if ext in SublimeServer.extensions_map:
+            return SublimeServer.extensions_map[ext]
         else:
-            return self.extensions_map['']
-
-    if not mimetypes.inited:
-        mimetypes.init() # try to read system mime.types
-    extensions_map = mimetypes.types_map.copy()
-    extensions_map.update({
-        '': 'application/octet-stream', # Default
-        '.py': 'text/plain',
-        '.c': 'text/plain',
-        '.h': 'text/plain',
-        })
+            return SublimeServer.extensions_map['']
 
 class SublimeServerThread(threading.Thread):
     httpd = None
@@ -246,6 +249,10 @@ class SublimeServerThread(threading.Thread):
         global settings
         # threading.Thread.__init__(self)
         super(SublimeServerThread, self).__init__()
+        if not mimetypes.inited:
+            mimetypes.init() # try to read system mime.types
+        SublimeServer.extensions_map = mimetypes.types_map.copy()
+        SublimeServer.extensions_map.update(settings.get('mimetypes'))
         self.httpd = TCPServer(("", settings.get('port')), SublimeServer)
         self.setName(self.__class__.__name__)
         
@@ -275,13 +282,19 @@ class SublimeserverStartCommand(sublime_plugin.WindowCommand):
                 # max attempts reached
                 # reset attempts to 0
                 attempts = 0
-                sublime.message_dialog(message)
+                try:
+                    sublime.message_dialog(message)
+                except UnicodeDecodeError:
+                    sublime.message_dialog(message.decode(sys.getfilesystemencoding()))
             else:
                 # try another attempt
                 sublime.set_timeout(lambda: 
                     self.window.run_command('sublimeserver_start'), 
                     settings.get('interval')
                 )
+    def is_enabled(self):
+        global thread
+        return not (thread is not None and thread.is_alive())
 
 class SublimeserverStopCommand(sublime_plugin.WindowCommand):
     def run(self):
@@ -291,22 +304,35 @@ class SublimeserverStopCommand(sublime_plugin.WindowCommand):
             thread.join()
             thread = None
         sublime.status_message('SublimeServer Stopped!')
+    def is_enabled(self):
+        global thread
+        return thread is not None and thread.is_alive()
 
 class SublimeserverRestartCommand(sublime_plugin.WindowCommand):
     def run(self):
         self.window.run_command('sublimeserver_stop')
+        sublime.set_timeout(lambda: sublime.run_command('sublimeserver_reload'), 0)
         sublime.set_timeout(lambda: 
             self.window.run_command('sublimeserver_start'), 
             settings.get('interval')
         )
+    def is_enabled(self):
+        global thread
+        return thread is not None and thread.is_alive()
+
+class SublimeserverReloadCommand(sublime_plugin.ApplicationCommand):
+    def run(self):
+        global dic, get_directories, settings, load_settings
+        dic = get_directories()
+        settings = load_settings()
 
 class SublimeserverBrowserCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        global dic, settings, thread
+        global dic, settings, thread, get_directories
         if thread is None or not thread.is_alive():
             return sublime.message_dialog('SublimeServer isn\'t Started yet!')
-        if dic is None:
-            dic = get_directories()
+        # if dic is None:
+        dic = get_directories()
         url = "http://localhost:{0}/{1}"
         filename = self.view.file_name()
         for k in dic:
@@ -316,6 +342,9 @@ class SublimeserverBrowserCommand(sublime_plugin.TextCommand):
                 return webbrowser.open(url)
         rawname = filename.split(os.path.sep)[-1]
         sublime.message_dialog('File %s not in Sublime Project Folder!' % rawname)
+    def is_enabled(self):
+        global thread
+        return thread is not None and thread.is_alive()
 
 # load settings now
 settings = load_settings()
