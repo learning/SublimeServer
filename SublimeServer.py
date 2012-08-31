@@ -1,4 +1,4 @@
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 # SublimeServer Settings
 settings = None
@@ -8,6 +8,8 @@ thread = None
 dic = None
 # Fail attempts
 attempts = 0
+# Sublime complete loaded?
+loaded = False
 
 import sublime, sublime_plugin
 import webbrowser
@@ -43,6 +45,8 @@ def load_settings():
         '.c': 'text/plain',
         '.h': 'text/plain',
     }
+    # default autorun
+    defaultAutorun = False
 
     # load SublimeServer settings
     s = sublime.load_settings('SublimeServer.sublime-settings')
@@ -55,6 +59,8 @@ def load_settings():
         s.set('interval', defaultInterval)
     if not s.has('mimetypes'):
         s.set('mimetypes', defaultMimeTypes)
+    if not s.has('autorun'):
+        s.set('autorun', defaultAutorun)
     sublime.save_settings('SublimeServer.sublime-settings')
     return s
 
@@ -265,7 +271,7 @@ class SublimeServerThread(threading.Thread):
         self.httpd.server_close()
         self._stop.set()
 
-class SublimeserverStartCommand(sublime_plugin.WindowCommand):
+class SublimeserverStartCommand(sublime_plugin.ApplicationCommand):
     def run(self):
         global settings, thread, dic, attempts
         if thread is not None and thread.is_alive():
@@ -289,14 +295,14 @@ class SublimeserverStartCommand(sublime_plugin.WindowCommand):
             else:
                 # try another attempt
                 sublime.set_timeout(lambda: 
-                    self.window.run_command('sublimeserver_start'), 
+                    sublime.run_command('sublimeserver_start'), 
                     settings.get('interval')
                 )
     def is_enabled(self):
         global thread
         return not (thread is not None and thread.is_alive())
 
-class SublimeserverStopCommand(sublime_plugin.WindowCommand):
+class SublimeserverStopCommand(sublime_plugin.ApplicationCommand):
     def run(self):
         global thread
         if thread is not None and thread.is_alive():
@@ -308,12 +314,12 @@ class SublimeserverStopCommand(sublime_plugin.WindowCommand):
         global thread
         return thread is not None and thread.is_alive()
 
-class SublimeserverRestartCommand(sublime_plugin.WindowCommand):
+class SublimeserverRestartCommand(sublime_plugin.ApplicationCommand):
     def run(self):
-        self.window.run_command('sublimeserver_stop')
+        sublime.run_command('sublimeserver_stop')
         sublime.set_timeout(lambda: sublime.run_command('sublimeserver_reload'), 0)
         sublime.set_timeout(lambda: 
-            self.window.run_command('sublimeserver_start'), 
+            sublime.run_command('sublimeserver_start'), 
             settings.get('interval')
         )
     def is_enabled(self):
@@ -355,3 +361,13 @@ for t in threads:
     if t.__class__.__name__ is SublimeServerThread.__name__:
         thread = t
         break
+
+class SublimeserverAutorun(sublime_plugin.EventListener):
+    def on_activated(self, view):
+        global loaded
+        if loaded:
+            return
+        loaded = True
+        # if autorun set to True
+        if settings.get('autorun') and thread is None:
+            sublime.run_command('sublimeserver_start')
