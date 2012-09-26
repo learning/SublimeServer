@@ -47,6 +47,8 @@ def load_settings():
     }
     # default autorun
     defaultAutorun = False
+    # default extension
+    defaultExtension = '.html'
 
     # load SublimeServer settings
     s = sublime.load_settings('SublimeServer.sublime-settings')
@@ -61,6 +63,8 @@ def load_settings():
         s.set('mimetypes', defaultMimeTypes)
     if not s.has('autorun'):
         s.set('autorun', defaultAutorun)
+    if not s.has('defaultExtension'):
+        s.set('defaultExtension', defaultExtension)
     sublime.save_settings('SublimeServer.sublime-settings')
     return s
 
@@ -103,9 +107,11 @@ class SublimeServer(BaseHTTPServer.BaseHTTPRequestHandler):
 
     server_version = "SublimeServer/" + __version__
     extensions_map = {}
+    defaultExtension = None
 
     def do_GET(self):
         """Serve a GET request."""
+        print 'GET ' + self.path
         f = self.send_head()
         if f:
             self.copyfile(f, self.wfile)
@@ -140,6 +146,14 @@ class SublimeServer(BaseHTTPServer.BaseHTTPRequestHandler):
                     break
             else:
                 return self.list_directory(path)
+
+        # If there's no extension and the file doesn't exist,
+        # see if the file plus the default extension exists.
+        if (SublimeServer.defaultExtension and
+            not posixpath.splitext(path)[1] and
+            not posixpath.exists(path) and
+            posixpath.exists(path + SublimeServer.defaultExtension)):
+            path += SublimeServer.defaultExtension
 
         ctype = self.guess_type(path)
         try:
@@ -259,6 +273,7 @@ class SublimeServerThread(threading.Thread):
             mimetypes.init() # try to read system mime.types
         SublimeServer.extensions_map = mimetypes.types_map.copy()
         SublimeServer.extensions_map.update(settings.get('mimetypes'))
+        SublimeServer.defaultExtension = settings.get('defaultExtension')
         self.httpd = TCPServer(("", settings.get('port')), SublimeServer)
         self.setName(self.__class__.__name__)
         
