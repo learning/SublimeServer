@@ -61,6 +61,15 @@ def load_settings():
         s.set('mimetypes', defaultMimeTypes)
     if not s.has('autorun'):
         s.set('autorun', defaultAutorun)
+
+    # Normalize base path.
+    if s.has('base'):
+        base = s.get('base')
+        base = base.replace('\\', '/')
+        if not base.endswith('/'):
+            base += '/'
+        s.set('base', base)
+
     sublime.save_settings('SublimeServer.sublime-settings')
     return s
 
@@ -103,6 +112,7 @@ class SublimeServer(BaseHTTPServer.BaseHTTPRequestHandler):
 
     server_version = "SublimeServer/" + __version__
     extensions_map = {}
+    base_path = None
 
     def do_GET(self):
         """Serve a GET request."""
@@ -224,6 +234,8 @@ class SublimeServer(BaseHTTPServer.BaseHTTPRequestHandler):
         # the browser try to get favourite icon
         if path == '/favicon.ico':
             return sublime.packages_path() + "/SublimeServer/favicon.ico"
+        if SublimeServer.base_path:
+            path = SublimeServer.base_path + path
         # else, deal with path...
         words = path.split('/')
         words = filter(None, words)
@@ -259,6 +271,7 @@ class SublimeServerThread(threading.Thread):
             mimetypes.init() # try to read system mime.types
         SublimeServer.extensions_map = mimetypes.types_map.copy()
         SublimeServer.extensions_map.update(settings.get('mimetypes'))
+        SublimeServer.base_path = settings.get('base')
         self.httpd = TCPServer(("", settings.get('port')), SublimeServer)
         self.setName(self.__class__.__name__)
         
@@ -341,10 +354,17 @@ class SublimeserverBrowserCommand(sublime_plugin.TextCommand):
         dic = get_directories()
         url = "http://localhost:{0}/{1}"
         filename = self.view.file_name()
+        base = settings.get('base')
+        # Find the file.
         for k in dic:
             if filename.startswith(dic[k]):
-                url = url.format(settings.get('port'), 
-                    k + filename[len(dic[k]):])
+                path = k + filename[len(dic[k]):]
+                # Normalize path for Windows users.
+                path = path.replace('\\', '/')
+                # Remove base path from URL. It's assumed by server.
+                if base and path.startswith(base):
+                    path = path[len(base):]
+                url = url.format(settings.get('port'), path)
                 return webbrowser.open(url)
         rawname = filename.split(os.path.sep)[-1]
         sublime.message_dialog('File %s not in Sublime Project Folder!' % rawname)
