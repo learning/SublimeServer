@@ -266,6 +266,10 @@ class SublimeServer(BaseHTTPServer.BaseHTTPRequestHandler):
         # the browser try to get favourite icon
         if path == '/favicon.ico':
             return sublime.packages_path() + "/SublimeServer/favicon.ico"
+        # markdown java script from https://github.com/evilstreak/markdown-js
+        elif path == '/markdown.js':
+            return sublime.packages_path() + "/SublimeServer/markdown.js"
+
         # else, deal with path...
         words = path.split('/')
         words = filter(None, words)
