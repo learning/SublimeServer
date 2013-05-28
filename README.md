@@ -5,11 +5,10 @@
 ------
 
 ## Markdown Rendering
-When requested a Markdown file(.md) the server returns an Html file that will reder Markdown syntax in the Html file into Html Syntax later.
+When a client requests a Markdown file(.md), the server will return an Html file instead of the requested Markdown file, the Html file contains all of content of the Markdown file and will render Markdown syntax into Html syntax on the client side.
 
 ### Setup
-Add mime types
-Open Tools-SublimeServer-Settings, add Markdown mime types like below
+Open Tools-SublimeServer-Settings, add mime types for Markdown like below
 
 	{
 		"attempts": 5,
