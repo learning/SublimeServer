@@ -106,6 +106,16 @@ class SublimeServer(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def do_GET(self):
         """Serve a GET request."""
+
+        # special case for .md files
+        path = self.translate_path(self.path)
+        if not os.path.isdir(path):
+            ctype = self.guess_type(path)
+            # ".md": "text/x-markdown; charset=UTF-8",
+            if ctype and ctype.startswith("text/x-markdown"):                
+                self.send_md()            
+                return 
+
         f = self.send_head()
         if f:
             self.copyfile(f, self.wfile)
@@ -157,6 +167,38 @@ class SublimeServer(BaseHTTPServer.BaseHTTPRequestHandler):
         self.send_header("Last-Modified", self.date_time_string(fs.st_mtime))
         self.end_headers()
         return f
+
+    def send_md(self):
+        path = self.translate_path(self.path)
+        try:
+            TEMPLATE = """
+                <!DOCTYPE html>
+                <html>
+                  <body>
+                    <div id="preview"></div>
+                    <div id="markdown" style="visibility:hidden;">%s</div>
+                    <script src="/markdown.js"></script>
+                    <script>
+                    window.addEventListener('load', function() {
+                        var markdown_src=document.getElementById("markdown").textContent;
+                        var preview = document.getElementById("preview");
+                        preview.innerHTML = markdown.toHTML(markdown_src);      
+                     }) ;    
+                    </script>   
+                  </body>
+                </html>
+                """
+            html = TEMPLATE % open(path,"r").read()
+        except IOError:
+            self.send_error(404, "File not found")
+            return None
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.send_header("Content-Length", len(html))
+        self.send_header("Last-Modified", time.time())
+        self.end_headers()
+        
+        self.wfile.write(html)
 
     # Maybe we can using template
     def list_directory(self, path):
