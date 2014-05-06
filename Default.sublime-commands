@@ -1,21 +1,21 @@
 [
-	{
-	    "command": "sublimeserver_start",
-	    "caption": "SublimeServer: Start SublimeServer"
-	},
-	{
-	    "command": "sublimeserver_stop",
-	    "caption": "SublimeServer: Stop SublimeServer"
-	},
-	{
-	    "command": "sublimeserver_restart",
-	    "caption": "SublimeServer: Restart SublimeServer"
-	},
-	{
-    	"caption": "SublimeServer: Manage SublimeServer Settings", 
-    	"command": "open_file", 
-    	"args": {
+    {
+        "command": "sublimeserver_start",
+        "caption": "SublimeServer: Start SublimeServer"
+    },
+    {
+        "command": "sublimeserver_stop",
+        "caption": "SublimeServer: Stop SublimeServer"
+    },
+    {
+        "command": "sublimeserver_restart",
+        "caption": "SublimeServer: Restart SublimeServer"
+    },
+    {
+        "caption": "SublimeServer: Manage SublimeServer Settings", 
+        "command": "open_file", 
+        "args": {
             "file": "${packages}/User/SublimeServer.sublime-settings"
         }
-	}
+    }
 ]
