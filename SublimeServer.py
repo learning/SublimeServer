@@ -1,17 +1,33 @@
 # ------------------------------------------------------------------------------
-# SublimeServer 0.3.0
+# SublimeServer 0.3.1
 # ------------------------------------------------------------------------------
-__version__ = "0.3.0"
+__VERSION__ = "0.3.1"
 
-import os, sys, sublime, sublime_plugin, threading, webbrowser, posixpath, socket, cgi, shutil, mimetypes, time, io
+import os
+import sys
+import sublime
+import sublime_plugin
+import threading
+import webbrowser
+import posixpath
+import socket
+import cgi
+import shutil
+import mimetypes
+import time
+import io
+
 # detect python's version
 python_version = sys.version_info[0]
 
+# Sublime 3 (Python 3.x)
 if python_version == 3:
     from http.server import BaseHTTPRequestHandler, HTTPServer
     from socketserver import ThreadingMixIn, TCPServer
     # from io import StringIO
     from urllib import parse as urllib
+
+# Sublime 2 (Python 2.x)
 else:
     from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
     from SocketServer import ThreadingMixIn, TCPServer
@@ -29,6 +45,7 @@ attempts = 0
 # Sublime complete loaded?
 loaded = False
 
+
 def load_settings():
     '''Load SublimeServer Settings'''
     # default settings
@@ -39,7 +56,7 @@ def load_settings():
     defaultInterval = 500
     # default mimeType
     defaultMimeTypes = {
-        '': 'application/octet-stream', # Default
+        '': 'application/octet-stream',  # Default
         '.py': 'text/plain',
         '.c': 'text/plain',
         '.h': 'text/plain',
@@ -62,6 +79,7 @@ def load_settings():
         s.set('autorun', defaultAutorun)
     sublime.save_settings('SublimeServer.sublime-settings')
     return s
+
 
 def get_directories():
     '''Get Open Directories in Sublime'''
@@ -101,7 +119,7 @@ class SublimeServerHandler(BaseHTTPRequestHandler):
 
     def version_string(self):
         '''overwrite HTTP server's version string'''
-        return 'SublimeServer/' + __version__ + ' ' + 'Sublime/' + sublime.version()
+        return 'SublimeServer/%s Sublime/%s' % (__VERSION__, sublime.version())
 
     def do_GET(self):
         """Serve a GET request."""
@@ -159,14 +177,15 @@ class SublimeServerHandler(BaseHTTPRequestHandler):
             self.send_header("Content-type", ctype)
             fs = os.fstat(f.fileno())
             self.send_header("Content-Length", str(fs[6]))
-            self.send_header("Last-Modified", self.date_time_string(fs.st_mtime))
+            self.send_header(
+                "Last-Modified", self.date_time_string(fs.st_mtime))
             self.end_headers()
             return f
         except:
             f.close()
             raise
 
-    # Maybe we can using template
+    # Maybe we can using templates here
     def list_directory(self, path):
         global dic
         # a flag to mark if current directory is root
@@ -194,7 +213,8 @@ class SublimeServerHandler(BaseHTTPRequestHandler):
         # output open directories
         if root is True:
             for key in dic:
-                r.append('<li><a href="%s">%s/</a>\n' % (urllib.quote(key), cgi.escape(key)))
+                r.append('<li><a href="%s">%s/</a>\n' % (
+                    urllib.quote(key), cgi.escape(key)))
         else:
             for name in list:
                 fullname = os.path.join(path, name)
@@ -205,8 +225,8 @@ class SublimeServerHandler(BaseHTTPRequestHandler):
                     linkname = name + "/"
                 if os.path.islink(fullname):
                     displayname = name + "@"
-                    # Note: a link to a directory displays with @ and links with /
-                r.append('<li><a href="%s">%s</a>\n' % (urllib.quote(linkname), cgi.escape(displayname)))
+                r.append('<li><a href="%s">%s</a>\n' % (
+                    urllib.quote(linkname), cgi.escape(displayname)))
         r.append("</ul>\n<hr>\n</body>\n</html>\n")
         print(r)
         encoded = ''.join(r).encode(enc)
@@ -225,13 +245,14 @@ class SublimeServerHandler(BaseHTTPRequestHandler):
     def translate_path(self, path):
         global dic
         # abandon query parameters
-        path = path.split('?',1)[0]
-        path = path.split('#',1)[0]
+        path = path.split('?', 1)[0]
+        path = path.split('#', 1)[0]
         # Don't forget explicit trailing slash when normalizing. Issue17324
         trailing_slash = path.rstrip().endswith('/')
         path = posixpath.normpath(urllib.unquote(path))
         if path == '/':
-            sublime.set_timeout(lambda: sublime.run_command('sublimeserver_reload'), 0)
+            sublime.set_timeout(
+                lambda: sublime.run_command('sublimeserver_reload'), 0)
             # sleep 0.001 second to wait SublimeserverReloadCommand done
             # any else sulotion?
             time.sleep(0.001)
@@ -271,8 +292,10 @@ class SublimeServerHandler(BaseHTTPRequestHandler):
         else:
             return SublimeServerHandler.extensions_map['']
 
+
 class SublimeServerThreadMixIn(ThreadingMixIn, TCPServer):
     pass
+
 
 class SublimeServerThread(threading.Thread):
     httpd = None
@@ -281,12 +304,12 @@ class SublimeServerThread(threading.Thread):
         settings = load_settings()
         super(SublimeServerThread, self).__init__()
         if not mimetypes.inited:
-            mimetypes.init() # try to read system mime.types
+            mimetypes.init()  # try to read system mime.types
         SublimeServerHandler.extensions_map = mimetypes.types_map.copy()
         SublimeServerHandler.extensions_map.update(settings.get('mimetypes'))
         self.httpd = SublimeServerThreadMixIn(('', 8080), SublimeServerHandler)
         self.setName(self.__class__.__name__)
-        
+
     def run(self):
         self.httpd.serve_forever()
         self._stop = threading.Event()
@@ -295,6 +318,7 @@ class SublimeServerThread(threading.Thread):
         self.httpd.shutdown()
         self.httpd.server_close()
         self._stop.set()
+
 
 class SublimeserverStartCommand(sublime_plugin.ApplicationCommand):
     def run(self):
@@ -320,13 +344,14 @@ class SublimeserverStartCommand(sublime_plugin.ApplicationCommand):
                 #     sublime.message_dialog(message.decode(sys.getfilesystemencoding()))
             else:
                 # try another attempt
-                sublime.set_timeout(lambda: 
-                    sublime.run_command('sublimeserver_start'), 
-                    settings.get('interval')
-                )
+                sublime.set_timeout(
+                    lambda: sublime.run_command('sublimeserver_start'),
+                    settings.get('interval'))
+
     def is_enabled(self):
         global thread
         return not (thread is not None and thread.is_alive())
+
 
 class SublimeserverStopCommand(sublime_plugin.ApplicationCommand):
     def run(self):
@@ -336,28 +361,33 @@ class SublimeserverStopCommand(sublime_plugin.ApplicationCommand):
             thread.join()
             thread = None
         sublime.status_message('SublimeServer Stopped!')
+
     def is_enabled(self):
         global thread
         return thread is not None and thread.is_alive()
+
 
 class SublimeserverRestartCommand(sublime_plugin.ApplicationCommand):
     def run(self):
         global settings
         sublime.run_command('sublimeserver_stop')
-        sublime.set_timeout(lambda: sublime.run_command('sublimeserver_reload'), 0)
-        sublime.set_timeout(lambda: 
-            sublime.run_command('sublimeserver_start'), 
-            settings.get('interval')
-        )
+        sublime.set_timeout(
+            lambda: sublime.run_command('sublimeserver_reload'), 0)
+        sublime.set_timeout(
+            lambda: sublime.run_command('sublimeserver_start'),
+            settings.get('interval'))
+
     def is_enabled(self):
         global thread
         return thread is not None and thread.is_alive()
+
 
 class SublimeserverReloadCommand(sublime_plugin.ApplicationCommand):
     def run(self):
         global dic, get_directories, settings, load_settings
         dic = get_directories()
         settings = load_settings()
+
 
 class SublimeserverBrowserCommand(sublime_plugin.TextCommand):
     def run(self, edit):
@@ -370,14 +400,17 @@ class SublimeserverBrowserCommand(sublime_plugin.TextCommand):
         filename = self.view.file_name()
         for k in dic:
             if filename.startswith(dic[k]):
-                url = url.format(settings.get('port'), 
-                    k + filename[len(dic[k]):])
+                url = url.format(
+                    settings.get('port'), k + filename[len(dic[k]):])
                 return webbrowser.open(url)
         rawname = filename.split(os.path.sep)[-1]
-        sublime.message_dialog('File %s not in Sublime Project Folder!' % rawname)
+        sublime.message_dialog(
+            'File %s not in Sublime Project Folder!' % rawname)
+
     def is_enabled(self):
         global thread
         return thread is not None and thread.is_alive()
+
 
 class SublimeserverAutorun(sublime_plugin.EventListener):
     def on_activated(self, view):
