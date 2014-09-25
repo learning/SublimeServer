@@ -307,7 +307,7 @@ class SublimeServerThread(threading.Thread):
             mimetypes.init()  # try to read system mime.types
         SublimeServerHandler.extensions_map = mimetypes.types_map.copy()
         SublimeServerHandler.extensions_map.update(settings.get('mimetypes'))
-        self.httpd = SublimeServerThreadMixIn(('', 8080), SublimeServerHandler)
+        self.httpd = SublimeServerThreadMixIn(('', settings.get('port')), SublimeServerHandler)
         self.setName(self.__class__.__name__)
 
     def run(self):
