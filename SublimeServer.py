@@ -424,8 +424,10 @@ class SublimeserverAutorun(sublime_plugin.EventListener):
 
 # load settings now
 settings = load_settings()
-print('settings loaded')
-print(settings)
+# For ST3
+def plugin_loaded():
+    global settings
+    settings = load_settings()
 
 # check if last SublimeServerThread exists
 threads = threading.enumerate()
