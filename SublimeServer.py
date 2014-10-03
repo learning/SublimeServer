@@ -208,6 +208,7 @@ class SublimeServerHandler(BaseHTTPRequestHandler):
         r.append('<!DOCTYPE html>')
         r.append('<html>\n<head>\n<meta charset="%s"/>\n' % enc)
         r.append('<title>SublimeServer %s</title>\n</head>\n' % displaypath)
+        r.append('<link rel="stylesheet" type="text/css" href="/SublimeServer.css">')
         r.append('<body>\n<h2>SublimeServer %s</h2>\n' % displaypath)
         r.append('<hr>\n<ul>\n')
         # output open directories
@@ -228,9 +229,7 @@ class SublimeServerHandler(BaseHTTPRequestHandler):
                 r.append('<li><a href="%s">%s</a>\n' % (
                     urllib.quote(linkname), cgi.escape(displayname)))
         r.append("</ul>\n<hr>\n</body>\n</html>\n")
-        print(r)
         encoded = ''.join(r).encode(enc)
-        print(encoded)
         f = io.BytesIO()
         f.write(encoded)
         # length = f.tell()
@@ -260,6 +259,8 @@ class SublimeServerHandler(BaseHTTPRequestHandler):
         # the browser try to get favourite icon
         if path == '/favicon.ico':
             return sublime.packages_path() + "/SublimeServer/favicon.ico"
+        if path == '/SublimeServer.css':
+            return sublime.packages_path() + "/SublimeServer/style.example.css"
         # else, deal with path...
         words = path.split('/')
         words = filter(None, words)
