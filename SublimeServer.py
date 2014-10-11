@@ -63,6 +63,8 @@ def load_settings():
     }
     # default autorun
     defaultAutorun = False
+    # default extension
+    defaultExtension = '.html'
 
     # load SublimeServer settings
     s = sublime.load_settings('SublimeServer.sublime-settings')
@@ -77,6 +79,8 @@ def load_settings():
         s.set('mimetypes', defaultMimeTypes)
     if not s.has('autorun'):
         s.set('autorun', defaultAutorun)
+    if not s.has('defaultExtension'):
+        s.set('defaultExtension', defaultExtension)
     sublime.save_settings('SublimeServer.sublime-settings')
     return s
 
@@ -116,6 +120,7 @@ def get_directories():
 class SublimeServerHandler(BaseHTTPRequestHandler):
 
     extensions_map = {}
+    defaultExtension = None
 
     def version_string(self):
         '''overwrite HTTP server's version string'''
@@ -162,6 +167,14 @@ class SublimeServerHandler(BaseHTTPRequestHandler):
                     break
             else:
                 return self.list_directory(path)
+
+        # If there's no extension and the file doesn't exist,
+        # see if the file plus the default extension exists.
+        if (SublimeServerHandler.defaultExtension and
+            not posixpath.splitext(path)[1] and
+            not posixpath.exists(path) and
+            posixpath.exists(path + SublimeServerHandler.defaultExtension)):
+            path += SublimeServerHandler.defaultExtension
 
         ctype = self.guess_type(path)
         try:
@@ -308,6 +321,7 @@ class SublimeServerThread(threading.Thread):
             mimetypes.init()  # try to read system mime.types
         SublimeServerHandler.extensions_map = mimetypes.types_map.copy()
         SublimeServerHandler.extensions_map.update(settings.get('mimetypes'))
+        SublimeServerHandler.defaultExtension = settings.get('defaultExtension')
         self.httpd = SublimeServerThreadMixIn(('', settings.get('port')), SublimeServerHandler)
         self.setName(self.__class__.__name__)
 
