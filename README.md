@@ -1,6 +1,6 @@
-#SublimeServer
+# SublimeServer
 
-####Allow you run a HTTP Server in SublimeText 2, and serves all the open project folders
+#### Turn you Sublime Text editor into a HTTP server, and serves all the open project folders, now support ST2 and ST3
 
 ------
 
