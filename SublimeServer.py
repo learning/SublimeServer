@@ -68,6 +68,7 @@ def load_settings():
 
     # load SublimeServer settings
     s = sublime.load_settings('SublimeServer.sublime-settings')
+
     # if setting file not exists, set to default
     if not s.has('port'):
         s.set('port', defaultPort)
@@ -81,7 +82,21 @@ def load_settings():
         s.set('autorun', defaultAutorun)
     if not s.has('defaultExtension'):
         s.set('defaultExtension', defaultExtension)
+
     sublime.save_settings('SublimeServer.sublime-settings')
+
+    # Merge project and user settings.
+    window = sublime.active_window()
+    if window:
+        view = window.active_view()
+        if view:
+            settings = view.settings()
+            if settings:
+                serverSettings = settings.get('SublimeServer')
+                if serverSettings:
+                    for setting in serverSettings:
+                        s.set(setting, serverSettings.get(setting))
+
     return s
 
 
@@ -393,6 +408,7 @@ class SublimeServerThread(threading.Thread):
 class SublimeserverStartCommand(sublime_plugin.ApplicationCommand):
     def run(self):
         global settings, thread, dic, attempts
+        settings = load_settings()
         if thread is not None and thread.is_alive():
             return sublime.message_dialog('SublimeServer Alread Started!')
         try:
@@ -462,6 +478,7 @@ class SublimeserverReloadCommand(sublime_plugin.ApplicationCommand):
 class SublimeserverBrowserCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         global dic, settings, thread, get_directories
+        settings = load_settings()
         if thread is None or not thread.is_alive():
             return sublime.message_dialog('SublimeServer isn\'t Started yet!')
         # if dic is None:
