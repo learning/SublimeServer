@@ -83,6 +83,14 @@ def load_settings():
     if not s.has('defaultExtension'):
         s.set('defaultExtension', defaultExtension)
 
+    # Normalize base path.
+    if s.has('base'):
+        base = s.get('base')
+        base = base.replace('\\', '/')
+        if not base.endswith('/'):
+            base += '/'
+        s.set('base', base)
+
     sublime.save_settings('SublimeServer.sublime-settings')
 
     # Merge project and user settings.
@@ -136,10 +144,12 @@ class SublimeServerHandler(BaseHTTPRequestHandler):
 
     extensions_map = {}
     defaultExtension = None
+    base_path = None
 
     def version_string(self):
         '''overwrite HTTP server's version string'''
         return 'SublimeServer/%s Sublime/%s' % (__VERSION__, sublime.version())
+
 
     def do_GET(self):
         """Serve a GET request."""
@@ -343,6 +353,8 @@ class SublimeServerHandler(BaseHTTPRequestHandler):
         elif path == '/markdown.js':
             return sublime.packages_path() + "/SublimeServer/markdown.js"
 
+        if SublimeServer.base_path:
+            path = SublimeServer.base_path + path
 
         # else, deal with path...
         words = path.split('/')
@@ -391,8 +403,10 @@ class SublimeServerThread(threading.Thread):
             mimetypes.init()  # try to read system mime.types
         SublimeServerHandler.extensions_map = mimetypes.types_map.copy()
         SublimeServerHandler.extensions_map.update(settings.get('mimetypes'))
+        SublimeServerHandler.base_path = settings.get('base')
         SublimeServerHandler.defaultExtension = settings.get('defaultExtension')
         self.httpd = SublimeServerThreadMixIn(('', settings.get('port')), SublimeServerHandler)
+
         self.setName(self.__class__.__name__)
 
     def run(self):
@@ -485,10 +499,17 @@ class SublimeserverBrowserCommand(sublime_plugin.TextCommand):
         dic = get_directories()
         url = "http://localhost:{0}/{1}"
         filename = self.view.file_name()
+        base = settings.get('base')
+        # Find the file.
         for k in dic:
             if filename.startswith(dic[k]):
-                url = url.format(
-                    settings.get('port'), k + filename[len(dic[k]):])
+                path = k + filename[len(dic[k]):]
+                # Normalize path for Windows users.
+                path = path.replace('\\', '/')
+                # Remove base path from URL. It's assumed by server.
+                if base and path.startswith(base):
+                    path = path[len(base):]
+                url = url.format(settings.get('port'), path)
                 return webbrowser.open(url)
         rawname = filename.split(os.path.sep)[-1]
         sublime.message_dialog(
