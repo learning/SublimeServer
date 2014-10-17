@@ -28,4 +28,50 @@ Open Tools-SublimeServer-Settings, add mime types for Markdown like below
 
 ------
 
-###For more details please visit http://learning.github.com/SublimeServer
+### Change Log
+
+#### 0.3.2 - Oct 12, 2014
+
+- Add markdown support, thanks rookiecj.
+- Add default stylesheet.
+- Add default extension setting, thanks jdiamond.
+- Fix some ST3 problems
+
+#### 0.3.1 - Jun 1, 2014
+
+Add Sublime Text 3 support.
+
+#### 0.2.1 - Aug 31, 2012
+
+Improvements
+- Add auto-start support, Thanks sapara.(#8)
+
+#### 0.2.0 - Jul 20, 2012
+
+Bug fix:
+
+While dragging new folders to Sublime or remove folders from Sublime, SublimeServer cannot refresh it.(#4)
+Improvements
+
+- Custom mime-types support.
+- Disable unavailable menu items, Thanks bizoo.(#6)
+
+#### 0.1.2 - Jun 28, 2012
+
+Bug fix:
+- Thread still alive and cannot stop.(#2)
+
+Misc:
+- Move SublimeServer.sublime-settings to User folder.
+
+#### 0.1.0 - Jun 02, 2012
+
+SublimeServer can basically use
+
+Know issues:
+
+- While sublime reload plugins, last SublimeServer thread still alive and cannot stop it.(#2)
+- While dragging new folders to Sublime or remove folders from Sublime, SublimeServer cannot refresh it.(#4)
+
+
+### For more details please visit http://learning.github.com/SublimeServer
