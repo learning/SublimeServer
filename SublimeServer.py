@@ -353,8 +353,8 @@ class SublimeServerHandler(BaseHTTPRequestHandler):
         elif path == '/markdown.js':
             return sublime.packages_path() + "/SublimeServer/markdown.js"
 
-        if SublimeServer.base_path:
-            path = SublimeServer.base_path + path
+        if SublimeServerHandler.base_path:
+            path = SublimeServerHandler.base_path + path
 
         # else, deal with path...
         words = path.split('/')
