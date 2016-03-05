@@ -74,4 +74,4 @@ Know issues:
 - While dragging new folders to Sublime or remove folders from Sublime, SublimeServer cannot refresh it.(#4)
 
 
-### For more details please visit http://learning.github.com/SublimeServer
+### For more details please visit [http://learning.github.com/SublimeServer](http://learning.github.com/SublimeServer)

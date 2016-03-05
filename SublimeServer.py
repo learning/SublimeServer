@@ -1,7 +1,7 @@
 # ------------------------------------------------------------------------------
-# SublimeServer 0.3.2
+# SublimeServer 0.3.3
 # ------------------------------------------------------------------------------
-__VERSION__ = "0.3.2"
+__VERSION__ = "0.3.3"
 
 import os
 import sys
@@ -170,6 +170,23 @@ class SublimeServerHandler(BaseHTTPRequestHandler):
             finally:
                 f.close()
 
+    def do_OPTIONS(self):
+        """Serve a OPTIONS request."""
+        self.send_response(200, "ok")
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS')
+        self.send_header("Access-Control-Allow-Headers", "X-Requested-With")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.end_headers()
+
+    def do_POST(self):
+        """Serve a POST request."""
+        self.do_GET()
+
+    def do_PUT(self):
+        """Serve a PUT request."""
+        self.do_GET()
+
     def do_HEAD(self):
         """Serve a HEAD request."""
         f = self.send_head()
@@ -225,6 +242,10 @@ class SublimeServerHandler(BaseHTTPRequestHandler):
             self.send_header("Content-type", ctype)
             fs = os.fstat(f.fileno())
             self.send_header("Content-Length", str(fs[6]))
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+            self.send_header("Pragma", "no-cache")
+            self.send_header("Expires", "0")
             self.send_header(
                 "Last-Modified", self.date_time_string(fs.st_mtime))
             self.end_headers()
@@ -245,11 +266,11 @@ class SublimeServerHandler(BaseHTTPRequestHandler):
                     <script src="/markdown.js"></script>
                     <script>
                     window.addEventListener('load', function() {
-                        var markdown_src=document.getElementById("markdown").textContent;
+                        var markdown_src = document.getElementById("markdown").textContent;
                         var preview = document.getElementById("preview");
-                        preview.innerHTML = markdown.toHTML(markdown_src);      
-                     }) ;    
-                    </script>   
+                        preview.innerHTML = markdown.toHTML(markdown_src);
+                    });
+                    </script>
                   </body>
                 </html>
                 """
@@ -411,12 +432,10 @@ class SublimeServerThread(threading.Thread):
 
     def run(self):
         self.httpd.serve_forever()
-        self._stop = threading.Event()
 
     def stop(self):
         self.httpd.shutdown()
         self.httpd.server_close()
-        self._stop.set()
 
 
 class SublimeserverStartCommand(sublime_plugin.ApplicationCommand):
