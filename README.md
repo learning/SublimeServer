@@ -30,6 +30,11 @@ Open Tools-SublimeServer-Settings, add mime types for Markdown like below
 
 ### Change Log
 
+#### 0.3.3 - Mar 6, 2016
+
+- Fix bug [#25](https://github.com/learning/SublimeServer/issues/25) 
+- Add OPTIONS, PUT, POST support
+
 #### 0.3.2 - Oct 12, 2014
 
 - Add markdown support, thanks rookiecj.
