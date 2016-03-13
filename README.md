@@ -33,13 +33,13 @@ Open Tools-SublimeServer-Settings, add mime types for Markdown like below
 #### 0.3.3 - Mar 6, 2016
 
 - Fix bug [#25](https://github.com/learning/SublimeServer/issues/25) 
-- Add OPTIONS, PUT, POST support
+- Add OPTIONS, PUT, POST support, thanks [fantonangeli](https://github.com/fantonangeli)
 
 #### 0.3.2 - Oct 12, 2014
 
 - Add markdown support, thanks rookiecj.
 - Add default stylesheet.
-- Add default extension setting, thanks jdiamond.
+- Add default extension setting, thanks [jdiamond](https://github.com/jdiamond).
 - Fix some ST3 problems
 
 #### 0.3.1 - Jun 1, 2014
@@ -49,7 +49,7 @@ Add Sublime Text 3 support.
 #### 0.2.1 - Aug 31, 2012
 
 Improvements
-- Add auto-start support, Thanks sapara.(#8)
+- Add auto-start support, Thanks [sapara](https://github.com/jdiamond).(#8)
 
 #### 0.2.0 - Jul 20, 2012
 
@@ -59,7 +59,7 @@ While dragging new folders to Sublime or remove folders from Sublime, SublimeSer
 Improvements
 
 - Custom mime-types support.
-- Disable unavailable menu items, Thanks bizoo.(#6)
+- Disable unavailable menu items, Thanks [bizoo](https://github.com/jdiamond).(#6)
 
 #### 0.1.2 - Jun 28, 2012
 
