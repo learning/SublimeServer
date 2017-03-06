@@ -274,7 +274,7 @@ class SublimeServerHandler(BaseHTTPRequestHandler):
                   </body>
                 </html>
                 """
-            html = TEMPLATE % open(path,"r").read()
+            html = TEMPLATE % open(path,"r",encoding='utf8').read()
         except IOError:
             self.send_error(404, "File not found")
             return None
@@ -284,7 +284,7 @@ class SublimeServerHandler(BaseHTTPRequestHandler):
         f.seek(0)
         self.send_response(200)
         self.send_header("Content-type", "text/html")
-        self.send_header("Content-Length", len(html))
+        self.send_header("Content-Length", len(encoded))
         self.send_header("Last-Modified", time.time())
         self.end_headers()
         
